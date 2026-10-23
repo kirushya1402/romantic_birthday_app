@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>App Automated Test Runner</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: monospace; padding: 20px; background: #0f172a; color: #38bdf8; }
+        .log-pass { color: #4ade80; font-weight: bold; }
+        .log-fail { color: #f87171; font-weight: bold; }
+        .test-box { background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Romantic Birthday App Automated Test Suite</h1>
+    <div id="test-results"></div>
+
+    <!-- Hidden DOM structure for running script functions -->
+    <div style="display:none;">
+        <canvas id="particles-canvas"></canvas>
+        <canvas id="confetti-canvas"></canvas>
+        <div id="music-control-btn"><span id="music-icon">🎵</span></div>
+        
+        <section id="page-admin" class="page-card active">
+            <input type="text" id="admin-user" value="wronguser">
+            <input type="password" id="admin-pass" value="buv">
+            <div class="error-msg" id="admin-error"></div>
+        </section>
+
+        <section id="page-birthday" class="page-card hidden">
+            <input type="text" id="birthday-input" value="">
+            <div class="error-msg" id="birthday-error"></div>
+        </section>
+
+        <section id="page-lover" class="page-card hidden">
+            <button id="btn-lover-a" onclick="selectLover('A')">A</button>
+            <button id="btn-lover-b" onclick="selectLover('B')">B</button>
+            <div class="error-msg" id="lover-error"></div>
+        </section>
+
+        <section id="page-proposal" class="page-card hidden"></section>
+
+        <section id="page-rejection" class="page-card hidden">
+            <button id="btn-please-say-yes" onclick="handleRejectionClick()">Please say yes</button>
+        </section>
+
+        <section id="page-happy-birthday" class="page-card hidden">
+            <div class="flame" id="flame-1"></div>
+            <div class="flame" id="flame-2"></div>
+            <div class="flame" id="flame-3"></div>
+            <p id="cake-status-text"></p>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const resultsEl = document.getElementById('test-results');
+
+        function logTest(testName, passed, details = '') {
+            const div = document.createElement('div');
+            div.className = 'test-box';
+            div.innerHTML = `<div>[${passed ? 'PASS' : 'FAIL'}] <strong>${testName}</strong></div><div>${details}</div>`;
+            div.style.color = passed ? '#4ade80' : '#f87171';
+            resultsEl.appendChild(div);
+        }
+
+        async function runTestSuite() {
+            try {
+                // Test 1a: Invalid Credentials Block
+                document.getElementById('admin-user').value = 'wronguser';
+                document.getElementById('admin-pass').value = 'wrongpass';
+                handleAdminLogin();
+                const isInvalidUserBlocked = document.getElementById('admin-error').classList.contains('show') &&
+                                             document.getElementById('admin-error').textContent === 'Incorrect username or passcode' &&
+                                             document.getElementById('page-admin').classList.contains('active');
+                logTest('1a. Invalid Admin Credentials Block', isInvalidUserBlocked, 'Invalid credentials blocked login and displayed "Incorrect username or passcode".');
+
+                // Test 1b: Valid Credentials ('buv' / 'krish') Login
+                document.getElementById('admin-user').value = 'buv';
+                document.getElementById('admin-pass').value = 'krish';
+                handleAdminLogin();
+                const isBirthdayPageActive = document.getElementById('page-birthday').classList.contains('active');
+                logTest('1b. Valid Admin Credentials Login (buv / krish)', isBirthdayPageActive, 'Username "buv" and password "krish" successfully logged in and navigated to Birthday Verification Page.');
+
+                // Test 2: Invalid Date Check
+                document.getElementById('birthday-input').value = '01.01.2000';
+                handleBirthdayVerification();
+                const isInvalidBlocked = document.getElementById('birthday-error').classList.contains('show') &&
+                                         document.getElementById('page-birthday').classList.contains('active');
+                logTest('2. Invalid Birthday Date Block (01.01.2000)', isInvalidBlocked, 'Entering 01.01.2000 blocked progression & showed error feedback.');
+
+                // Test 3: Valid Date Check (31.10.2005)
+                document.getElementById('birthday-input').value = '31.10.2005';
+                handleBirthdayVerification();
+                const isLoverPageActive = document.getElementById('page-lover').classList.contains('active');
+                logTest('3. Valid Birthday Date Verification (31.10.2005)', isLoverPageActive, 'Entering 31.10.2005 successfully unlocked Lover Selection Page.');
+
+                // Test 4: Lover Buttons Label Verification
+                const btnAContent = document.getElementById('btn-lover-a').textContent.trim();
+                const btnBContent = document.getElementById('btn-lover-b').textContent.trim();
+                const isExactLettersOnly = (btnAContent === 'A') && (btnBContent === 'B');
+                logTest('4. Exact Button Text Verification ("A" and "B" only)', isExactLettersOnly, `Button A text: "${btnAContent}", Button B text: "${btnBContent}". No extra label text inside buttons.`);
+
+                // Test 5: Lover Selection (Select A -> Proposal)
+                selectLover('A');
+                const isProposalActive = document.getElementById('page-proposal').classList.contains('active');
+                logTest('5. Lover Selection A -> Proposal Page', isProposalActive, 'Selecting Option A (Krish) successfully opened Marriage Proposal Page.');
+
+                // Test 6: Proposal -> "No" -> Rejection Flow -> "Please say yes" -> Happy Birthday
+                handleProposalChoice(false);
+                const isRejectionActive = document.getElementById('page-rejection').classList.contains('active');
+                logTest('6a. Proposal "No" -> Rejection Page', isRejectionActive, 'Clicking "No" routed to Rejection Page.');
+
+                handleRejectionClick();
+                const updatedBtnText = document.getElementById('btn-please-say-yes').textContent.trim();
+                const isTextUpdated = updatedBtnText.includes('YES');
+                logTest('6b. Rejection Button Text Update', isTextUpdated, `Button text updated to: "${updatedBtnText}".`);
+
+                await new Promise(r => setTimeout(r, 900));
+                const isHappyBirthdayActiveAfterRejection = document.getElementById('page-happy-birthday').classList.contains('active');
+                logTest('6c. Rejection -> Happy Birthday Navigation', isHappyBirthdayActiveAfterRejection, 'Clicking rejection button successfully navigated to Happy Birthday Page.');
+
+                // Test 7: Direct Proposal "Yes" Shortcut Flow
+                navigateTo('page-proposal');
+                handleProposalChoice(true);
+                const isHappyBirthdayActiveDirect = document.getElementById('page-happy-birthday').classList.contains('active');
+                logTest('7. Direct Proposal "Yes" Shortcut -> Happy Birthday Page', isHappyBirthdayActiveDirect, 'Clicking "Yes" on Proposal routed directly to Happy Birthday Page.');
+
+            } catch (err) {
+                logTest('Test Execution Error', false, err.message);
+            }
+        }
+
+        window.onload = runTestSuite;
+    </script>
+</body>
+</html>

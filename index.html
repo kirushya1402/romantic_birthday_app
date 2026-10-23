@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Mama! 💖 - Surprise from Krish</title>
+    <meta name="description" content="A romantic interactive birthday surprise web application for Mama with love from Krish.">
+    <!-- Security & HTTPS Meta Tags -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Floating Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Background Decorative Elements -->
+    <div class="sky-clouds-bg">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+
+    <!-- Main Application Wrapper -->
+    <main class="app-container">
+
+        <!-- 1. ADMIN LOGIN PAGE -->
+        <section id="page-admin" class="page-card active">
+            <div class="card-header">
+                <div class="floating-badge">🔒 Secret Admin Portal</div>
+                <h1 class="card-title">Admin Access</h1>
+                <p class="card-subtitle">Please sign in to unlock Mama's Special Birthday Surprise ✨</p>
+            </div>
+            <form id="admin-form" class="card-form" onsubmit="event.preventDefault(); handleAdminLogin();">
+                <div class="input-group">
+                    <label for="admin-user">Admin Username</label>
+                    <input type="text" id="admin-user" placeholder="Enter username" required autocomplete="off" value="">
+                </div>
+                <div class="input-group">
+                    <div class="label-with-hint">
+                        <label for="admin-pass">Passcode</label>
+                        <span class="field-hint">💡 Hint: Yours wife</span>
+                    </div>
+                    <input type="password" id="admin-pass" placeholder="Enter passcode" required value="">
+                </div>
+                <div class="error-msg" id="admin-error">Incorrect username or passcode</div>
+                <button type="submit" class="btn btn-primary btn-glow">
+                    <span>Login as Admin</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+            </form>
+            <div class="card-footer">
+                <p class="footer-hint">💡 Hint: Enter secret credentials to continue</p>
+            </div>
+        </section>
+
+        <!-- 2. BIRTHDAY VERIFICATION PAGE -->
+        <section id="page-birthday" class="page-card hidden">
+            <div class="card-header">
+                <div class="avatar-icon-wrap">
+                    <img src="assets/akaza_koyuki.jpg" alt="Akaza and Koyuki" class="mini-avatar">
+                </div>
+                <h1 class="card-title font-romantic">What is your birthday?</h1>
+                <p class="card-subtitle">Enter your birth date to prove you are the real birthday boy! 🎂</p>
+            </div>
+            <form id="birthday-form" class="card-form" onsubmit="event.preventDefault(); handleBirthdayVerification();">
+                <div class="input-group">
+                    <label for="birthday-input">Select or Type Birth Date (DD.MM.YYYY)</label>
+                    <input type="text" id="birthday-input" placeholder="DD.MM.YYYY" required autocomplete="off">
+                </div>
+                <div class="error-msg" id="birthday-error">Oopsie! That's not the right birth date. Please try again! 💖</div>
+                <button type="submit" class="btn btn-primary btn-glow">
+                    <span>Verify My Birthday</span>
+                    <span class="btn-heart">💖</span>
+                </button>
+            </form>
+            <div class="card-footer">
+                <p class="footer-hint">🔒 Security Check • Enter the special date to proceed</p>
+            </div>
+        </section>
+
+        <!-- 3. LOVER SELECTION PAGE -->
+        <section id="page-lover" class="page-card hidden">
+            <div class="card-header">
+                <div class="avatar-icon-wrap">
+                    <img src="assets/koyuki_solo.jpg" alt="Koyuki" class="mini-avatar">
+                </div>
+                <h1 class="card-title font-romantic">Who is your lover?</h1>
+                <p class="card-subtitle">Choose carefully below! 💖<br><strong class="highlight-text">Option A is Krish</strong></p>
+            </div>
+
+            <!-- Lover Selection Buttons: DISPLAYING ONLY "A" AND "B" INSIDE BUTTONS -->
+            <div class="options-container">
+                <div class="option-wrapper">
+                    <div class="option-label-tag">Option A (Krish)</div>
+                    <button id="btn-lover-a" class="btn-letter-choice btn-sky-gradient" onclick="selectLover('A')">A</button>
+                </div>
+                <div class="option-wrapper">
+                    <div class="option-label-tag">Option B</div>
+                    <button id="btn-lover-b" class="btn-letter-choice btn-sky-outline" onclick="selectLover('B')">B</button>
+                </div>
+            </div>
+            
+            <div class="error-msg" id="lover-error">Haha nice try! Krish (Option A) is your one and only lover! Click A ❤️</div>
+        </section>
+
+        <!-- 4. MARRIAGE PROPOSAL PAGE -->
+        <section id="page-proposal" class="page-card hidden">
+            <div class="card-header">
+                <div class="hero-image-wrap">
+                    <img src="assets/akaza_koyuki_hug.jpg" alt="Akaza and Koyuki" class="hero-card-img">
+                </div>
+                <h1 class="card-title proposal-heading font-romantic">Will you marry me??</h1>
+                <p class="author-tag">— by Krish 💍✨</p>
+            </div>
+            <div class="proposal-actions">
+                <button id="btn-proposal-yes" class="btn btn-yes btn-pulse" onclick="handleProposalChoice(true)">
+                    <span>Yes! 💖</span>
+                </button>
+                <button id="btn-proposal-no" class="btn btn-no" onclick="handleProposalChoice(false)">
+                    <span>No 😢</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 5. REJECTION PAGE -->
+        <section id="page-rejection" class="page-card hidden">
+            <div class="card-header">
+                <div class="sad-teddy-wrap">
+                    <img src="assets/akaza_koyuki.jpg" alt="Akaza and Koyuki" class="sad-teddy-img">
+                </div>
+                <h1 class="card-title font-romantic">Aww... Are you sure?? 🥺</h1>
+                <p class="card-subtitle">Krish's heart is breaking into a million pieces! Please rethink... 💔</p>
+            </div>
+            <div class="rejection-actions">
+                <button id="btn-please-say-yes" class="btn btn-primary btn-glow btn-xl" onclick="handleRejectionClick()">
+                    Please say yes
+                </button>
+            </div>
+        </section>
+
+        <!-- 6. HAPPY BIRTHDAY PAGE (FINAL DESTINATION) -->
+        <section id="page-happy-birthday" class="page-card page-card-lg hidden">
+            <!-- Header Banner -->
+            <div class="celebration-header">
+                <div class="floral-frame-wrap">
+                    <img src="assets/flowers.jpg" alt="Floral Decoration" class="floral-frame-img">
+                    <div class="teddy-center-wrap">
+                        <img src="assets/akaza_koyuki_hug.jpg" alt="Akaza and Koyuki Embrace" class="celebration-teddy">
+                    </div>
+                </div>
+                <h1 class="main-birthday-title font-romantic">Happy Birthday Mama <span class="sky-heart-svg"><svg viewBox="0 0 24 24" width="34" height="34" fill="#38bdf8"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span></h1>
+                <div class="sparkle-subtitle">✨ Wishing you the happiest birthday filled with endless love & joy ✨</div>
+            </div>
+
+            <!-- Virtual Birthday Cake Section -->
+            <div class="cake-interactive-section">
+                <h2 class="section-title">🎂 Make a Wish & Blow Out The Candles!</h2>
+                <div class="cake-container" id="cake-container" onclick="blowOutCandles()">
+                    <div class="cake">
+                        <div class="plate"></div>
+                        <div class="layer layer-bottom"></div>
+                        <div class="layer layer-middle"></div>
+                        <div class="layer layer-top"></div>
+                        <div class="icing"></div>
+                        <div class="drips">
+                            <div class="drip"></div><div class="drip"></div><div class="drip"></div><div class="drip"></div><div class="drip"></div>
+                        </div>
+                        <div class="candles-wrap">
+                            <div class="candle candle-1"><div class="flame" id="flame-1"></div></div>
+                            <div class="candle candle-2"><div class="flame" id="flame-2"></div></div>
+                            <div class="candle candle-3"><div class="flame" id="flame-3"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="cake-hint" id="cake-status-text">👇 Tap the candles to blow them out!</p>
+            </div>
+
+            <!-- Special Heartfelt Love Letter Section -->
+            <div class="special-letter-card">
+                <div class="letter-header">
+                    <span class="sky-heart-svg"><svg viewBox="0 0 24 24" width="24" height="24" fill="#38bdf8"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
+                    <h2>A Heartfelt Message For You, Mama</h2>
+                    <span class="sky-heart-svg"><svg viewBox="0 0 24 24" width="24" height="24" fill="#38bdf8"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
+                </div>
+                <div class="letter-body">
+                    <p>unna enaku romba pudikum mama epothumey happyah irunga santhosama irunga iml intha birth day la irunthu happy ah irunga smile oda irunga epothumey .im always there for you ...enna analum namma pathukalam na evalo sanda potalum in the end ne tha venum enaku anyways sorry for all the torcher mamss..iml achum kovatha koraika try panuven and ne asa patta mari pressure panama irupe trust oda ..i love you mamsss evalo kastama irnthalum enkita vanthurunga na pathukurenn..enaikum ungaluku na irupe ungalukaga santhosamo sogamoo na irupen iruken kavala padathinga mama.</p>
+                </div>
+                <div class="letter-footer">
+                    <span>— Yours Forever & Always, Krish <span class="sky-heart-svg"><svg viewBox="0 0 24 24" width="20" height="20" fill="#38bdf8"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>✨</span>
+                </div>
+            </div>
+
+            <!-- Couple Picture Memory Highlight -->
+            <div class="couple-memory-card">
+                <img src="assets/akaza_koyuki_hug.jpg" alt="Akaza & Koyuki" class="memory-couple-img">
+                <div class="memory-caption">
+                    <h3>"Together in heart, forever & always."</h3>
+                    <p>Happy Birthday Love <span class="sky-heart-svg"><svg viewBox="0 0 24 24" width="20" height="20" fill="#38bdf8"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span></p>
+                </div>
+            </div>
+
+            <!-- Final Footer Message -->
+            <div class="birthday-footer-banner">
+                <p>Made with infinite love by <strong>Krish</strong> for <strong>Mama</strong> 🌸</p>
+                <button class="btn btn-secondary btn-sm" onclick="restartSurprise()">🔄 Replay Surprise</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Application Script -->
+    <script src="script.js"></script>
+</body>
+</html>
